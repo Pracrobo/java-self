@@ -27,12 +27,14 @@ Set 타입 변수에 대입해도 되지만 TreeSet 타입으로 대입한 이�
 <tr><td>E</td> <td> ceiling(E e) </td> <td> 주어진 객체와 동등한 객체가 있으면 리턴, 만약 없다면 주어진 객체의 바로 위의 객체를 리턴 </td></tr>
 <tr><td>E</td> <td> pollFirst() </td> <td> 제일 낮은 객체를 꺼내오고 컬렉션에서 제거함 </td></tr>
 <tr><td>E</td> <td> pollLast() </td> <td> 제일 높은 객체를 꺼내오고 컬렉션에서 제거함 </td></tr>
-<tr><td> Iterator<E> </td> <td> descendingIIterator() </td> <td> 내림차순으로 정렬된 Iterator를 리턴 </td></tr>
-<tr><td> NavigableSet<E> </td> <td> descendingSet() </td> <td> 내림차순으로 정렬된 NavigableSet을 리턴 </td></tr>
-<tr><td> NavigableSet<E> </td> <td> headSet( EtoElement, boolean inclusive) </td> <td> 주어진 객체보다 낮은 객체들을 NavigableSet으로 리턴, 주어진 객체 포함 여부는 두번째 매개갑에 따라 달라짐 </td></tr>
-<tr><td> NavigableSet<E> </td> <td> tailSet(E from Element, boolean inclusive) </td> <td> 주어진 객체보다 높은 객체들을 NavigableSet으로 리턴, 주어진 객체 포함 여부는 두번째 매개갑에 따라 달라짐 </td></tr>
-<tr><td> NavigableSet<E> </td> <td> subSet(E from Element, boolean fromInclusive, E toElement, boolean toInclusive </td> <td> 시작과 끝으로 주어진 객체 사이의 객체들을 NavigableSet으로 리턴, 시작과 끝 객체의 포함여부는 두번째, 네번째 매개값에 따라 달라짐 </td></tr>
+<tr><td> Iterator(E) </td> <td> descendingIIterator() </td> <td> 내림차순으로 정렬된 Iterator를 리턴 </td></tr>
+<tr><td> NavigableSet(E) </td> <td> descendingSet() </td> <td> 내림차순으로 정렬된 NavigableSet을 리턴 </td></tr>
+<tr><td> NavigableSet(E) </td> <td> headSet( EtoElement, boolean inclusive) </td> <td> 주어진 객체보다 낮은 객체들을 NavigableSet으로 리턴, 주어진 객체 포함 여부는 두번째 매개갑에 따라 달라짐 </td></tr>
+<tr><td> NavigableSet(E) </td> <td> tailSet(E from Element, boolean inclusive) </td> <td> 주어진 객체보다 높은 객체들을 NavigableSet으로 리턴, 주어진 객체 포함 여부는 두번째 매개갑에 따라 달라짐 </td></tr>
+<tr><td> NavigableSet(E) </td> <td> subSet(E from Element, boolean fromInclusive, E toElement, boolean toInclusive </td> <td> 시작과 끝으로 주어진 객체 사이의 객체들을 NavigableSet으로 리턴, 시작과 끝 객체의 포함여부는 두번째, 네번째 매개값에 따라 달라짐 </td></tr>
 </table>
+** Iterator(E)와 NavigableSet(E)는 코드를 직접봐야한다.
+
 
 
 ## TreeMap
@@ -63,4 +65,34 @@ Map 타입 변수에 대입해도 되지만, TreeMap 타입으로 대입한 이�
 <tr><td> NavigableMap(K,V) </td> <td> tailMap(K from Key, boolean inclusive) </td> <td> 주어진 객체보다 높은 Map.Entry들을 NavigableMap으로 리턴, 주어진 Map.Entry 포함 여부는 두번째 매개갑에 따라 달라짐 </td></tr>
 <tr><td> NavigableMap(K,V) </td> <td> subMap(K from Key, boolean fromInclusive,K toKey, boolean toInclusive </td> <td> 시작과 끝으로 주어진 객체 사이의 Map.Entry들을 NavigableMap으로 반환, 시작과 끝 Map.Entry 포함여부는 두번째, 네번째 매개값에 따라 달라짐 </td></tr>
 </table>
-Map.Entry(K,V) 와 NavigableMap(K,V)는 <K,V>로 표기한다.
+** Map.Entry(K,V) 와 NavigableMap(K,V)는 코드를 직접 봐야한다.
+
+## Comparable과 Comparator
+TreeSet에 저장되는 객체와 TreeMap에 저장되는 키 객체는 저장과 동시에 오름차순으로 정렬되는데, 어떤 객체든 정렬될 수 있는 것은 아니고 객체가 Comparable 인터페이스를 구현하고 잇어야 가능한다.
+Integer, Double, String 타입은 모두 Comparable을 구현하고 있기 때문에 상관없지만 , 사용자 정의 객체를 저장할 때에는 반드시 Comparable을 구현하고 있어야 한다.
+Comparable 인터페이스에는 compareTo() 메소드가 정의되어 있다. 따라서 사용자 정의 클래스에서 이 메소드를 재정의해서 비교 결과를 정수 값으로 리턴해야 한다.
+<table>
+<tr><td>리턴 타입</td> <td> 메소드 </td>  <td>설명</td></tr>
+<tr><td>int</td> <td>compareTo(T o)</td>  <td>주어진 객체와 같으면 0을 리턴<br>주어진 객체보다 적으면 음수를 리턴<br>주어진 객체보다 크면 양수를 리턴</td></tr>
+</table>
+
+비교 기능이 있는 Comparable 구현 객체를 TreeSet 에 저장하거나 TreeMap의 키로 저장하는 것이 원칙이지만, 비교 기능이 없는 Comparable 비구현 객체를 저장하고 싶다면 방법은 없진 않ㄴ다.
+TreeSet  과 TreeMap을 생성할때 비교자 Comparator 를 다음과 같이 제공하면 된다.
+
+```java
+import java.util.Comparator;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+TreeSet<E> treeset = new TreeSet<E>(new ComparatorImpl());
+
+TreeMap<K, V> treeMap = new TreeMap<K, V>(new ComparatorImpl() );
+```
+
+비교자는 Comparator 인터페이스를 구현한 객체를 말하는데, Comparator 인터페이스에는 compare() 메소드가 정의되어 있다.
+비교자는 이 메소드를 재정의해서 비교 결과를 정수 값으로 리턴하면 된다.
+<table>
+<tr><td> 리턴타입</td> <td>매소드</td> <td>설명</td></tr>
+<tr><td> int</td> <td>compare(T o1, T o2) </td> <td> o1과 o2가 동등하다면 0을 리턴 <br> o1이 o2보다 앞에 오게 하려면 음수를 리턴 <br> o1이 o2 보다 뒤에 오게 하려면 양수를 리턴 </td></tr>
+</table>
+
