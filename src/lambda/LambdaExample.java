@@ -13,7 +13,7 @@ public class LambdaExample {
         });
     }
 
-    public static void action(Calculable calculable) {
+    public static void action(Calcuable00 calculable) {
         int x = 10;
         int y = 4;
         calculable.calculate(x, y);

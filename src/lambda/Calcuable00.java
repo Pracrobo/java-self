@@ -1,6 +1,6 @@
 package lambda;
 @FunctionalInterface
-public interface Calculable {
+public interface Calcuable00 {
     //추상메서드
     void calculate(int x, int y);
 }
