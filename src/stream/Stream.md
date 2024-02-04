@@ -44,7 +44,7 @@ for문, Iterator는 컬렉션의 요소를 컬렉션 바깥쪽으로 반복해�
 반면 내부 반복자는 개발자 코드에서 제공한 데이터 처리 코드(람다식)를 가지고 컬렉션 내부에서 요소를 반복처리한다.
 내부 반복자는 멀티 코어  CPU 를 최대한 활용하기 위해 요소들을 분배시켜 병렬 작업을 할 수 있다.
 하나씩 처리하는 순차적 외부 반복자보다는 효윻적으로 요소를 반복시킬 수 있는 장점이 있다.
-![img_1.png](img_1.png)<br>
+<br>![img_1.png](img_1.png)<br>
 ParallellStreamExample은 List 컬렉션의 내부 반복자를 이용해서 병렬 처리하는 방법을 알려주고 
 parallelStream()메소드로 병렬 처리 스트림을 덩고 forEach() 메소드를 호출할 때 요소 처리 방법인
 람다식을 제공한다. 람다식은 처리되는 요소가 무엇이고 어떤 스레드가 처리하는지 출력한다.
@@ -75,7 +75,7 @@ double avg = list.stream()
     .getAsDouble();
 ```
 스트림 파이프라인으로 구성할때 주의점은 파이프라인의 맨 끝에는 반드시 최종 처리 부분이 있어야 한다는 것이다.
-최종 처리가 없다면 오리지널 및 중간 처리 스트림은 동작하지 않는다. 즉, 위 코드에서 average() 이하ㅎ를 생랼하면 stream(), mapToInt()는 동작하지  않는다.
+최종 처리가 없다면 오리지널 및 중간 처리 스트림은 동작하지 않는다. 즉, 위 코드에서 average() 이하를 생략하면 stream(), mapToInt()는 동작하지 않는다.
 
 
 # 리소스로부터 스트림 얻기
@@ -99,3 +99,52 @@ Stream은 객체 요소를 처리하는 스트림이다. IntStream, Long Stream,
 ## 컬렉션으로부터 스트림 얻기
 java.util.Collection  인터페이스는 스트림과 parallelStream() 메소드를 가지고 있기 때문에 자식 인터페이스인 List, Set 인터페이스를 구현한 모든 컬렉션에서 객체 스트림을 얻을 수 있다.
 다음 Product 로 이어지는 예제는 List<Product> 컬렉션에서 Product 스트림을 얻는 방법을 보여준다.
+
+
+## 배열로부터 스트림 얻기
+java.util.Arrays 클래스를 이용하면 다양한 종류의 배열로부터 스트림을 얻을 수 있다. 
+ArrayStreamExample 클래스를 보면 된다.
+
+## 숫자 범위로부터 스트림 얻기
+IntStream, LongStream 의 정적메소드이니 range()와 rangeClosed() 메소드를 이용하면 특정 범위의 정수 스트림을 얻을 수 있다. 첫번째 매개값은 시작 수이고 두번째 매개값은 끝수인데, 끝수를 포함하지 않으면, range(), 포함하면 rangeClosed() 를 사용한다.
+IntStreamExample 클래스를 보면 된다.
+
+## 파일로부터 스트림 얻기
+java.nio.file.Files의 lines()메소드를 이용하면 텍스트 파일의 행단위 스트림을 얻을 수 있다. 이는 텍스트 파일에서 한 행씩 읽고 처리할때 우용하게 사용할 수 있따.
+data.txt 파일과 FileStream 클래스 예제를 보면 된다.
+
+
+# 요소 걸러내기 (필터링)
+필터링은 요소를 걸러내는 중간처리 기능이다. 필터링 매소드에는  distinct()와 filter()가 있다.
+<table>
+<tr><td>리턴타입</td><td>메소드(매개변수)</td><td>설명</td></tr>
+<tr><td>Stream / IntStream / LongStream / DoubleStream<td>distinct()</td><td>중복 제거</td></tr>
+<tr><td>Stream / IntStream / LongStream / DoubleStream<td>filter(Predicate(T)) / filter(IntPredicate) / filter(LongPredicate) / filter(DoublePredicate) </td><td>조건 필터링, 매개 타입은 요소 타입에 따른 함수형 인터페이스이므로 람다식으로 작성 가능</td></tr>
+</table>
+distinct() 메소드는 요소의 중복을 제거한다.
+객체 스트림일 경우, equals() 메소드의 리턴값이 true면 동일한 요소로 판단한다.
+IntStream, LongStream, DoubleStream은 같은 값일 경우 중복을 제거한다.
+
+![img_4.png](img_4.png)
+
+filter()매소드는 매개값으로 주어진 Predicate 가 true 를 리턴하는 요소만 필터링 한다.
+![img_5.png](img_5.png)
+
+Predicate 는 함수형 인터페이스로 다음과 같은 종류가 있다.
+<table>
+<tr><td>인터페이스</td><td>추상 메소드</td><td>설명</td></tr>
+<tr><td>Predicate(T)</td><td>boolean test(T t)</td><td>객체T를 조사</td></tr>
+<tr><td>IntPredicate</td><td>boolean test(int value)</td><td>int 값을 조사</td></tr>
+<tr><td>LongPredicate</td><td>boolean test(long value)</td><td>long 값을 조사</td></tr>
+<tr><td>DoublePredicate</td><td>boolean test(double value)</td><td>double값을 조사</td></tr>
+</table>
+
+![img_6.png](img_6.png)
+모든 Predicate는 매개값을 조사한 후 boolean을 리턴하는 test() 메소드를 가지고 있다.
+Predicate<T>을 람다식으로 표현하면 다음과 같다.
+```Java
+T -> { ... return true}
+또는
+T -> true; // return 문만 있을 경우 중괄호와  return 키워드 생략 가능
+```
+
