@@ -245,7 +245,7 @@ T -> 실행문; //하나의 실행문만 있을 경우 중괄호 생략
 ## 요소 기본 집계
 집계는 최종 처리 기능으로 요소들을 처리해서 카운팅, 합계, 평균값, 최대값, 최소값 등과 같이 하나의 값으로 산출하는 것을 말한다.
 즉, 대량의 데이터를 가공해서 하나의 값으로 축소하는 리덕션이고 볼 수 있다.
-![img.png](img.png)
+![img.png](resource/img_18.png)
 
 집계 메소드가 리턴하는 OptionalXXX는 Optional, OptionalDouble, OptionalInt, OptionalLong 클래스를 말한다.
 이들은 최종값을 저장하는 객체로 get(), getAsDouble(), getAsInt(), getAsLong()을 호출하면 최종값을 얻을 수 있다.
@@ -281,7 +281,7 @@ stream.average().ifPresent(a -> System.out.println("평귶": a));
 
 ## 요소 커스텀 집계
  다양한 집계 결과물을 만들 수 있도록 reduce()메소드로 제공한다.
- ![img_1.png](img_1.png)
+ ![img_1.png](resource/img_17.png)
 매개값이 BinaryOperator는 함수형 인터페이스다. BinaryOperator 는 두개의 매개값을 받아 하나의 값을 리턴하는 apply()메소드를 가지고 있기 때문에 람다식을 다음과 같이 작성할 수 있다.
 ```markdown
 (a,b) -> { .. return 값};
