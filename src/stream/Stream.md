@@ -330,3 +330,85 @@ Java16부터는 좀더 편리하게 요소 스트림에서 List 컬렉션을 얻
 List<Student> maleList = totalList.stream().filter(s -> s.getSex().equalS("남")).toList();
 ```
 
+## 요소 그룹핑
+collect() 메소드는 단순히 요소를 수집하는 기능 이외에 컬렉션의 요소들을 그룹핑해서 MAp 객체를 생성하는 기능도 제공한다.
+Collectors.groupingBy() 메소드 얻은 Collector를 collect() 메소드를 호출할 때 제공하면 된다.
+<table>
+<tr><td>리턴 타입 </td><td>메소드</td></tr>
+<tr><td>Colletor(T, ?, Map(K, List(T))) </td><td> groupingBy(Function(T, K)classifier)</td></tr>
+</table>
+
+groupingBy()는 Function을 이용해서 T를 K 로 매핑하고 K를 키로 해 List<T>를 값으로 갖는 Map 컬렉션을 생성한다.
+예시는 "남", "어" 를 키로 설정하고 List<Student>를 값으로 갖는 Map을 생성하는 코드다.
+
+ ```java
+ import java.util.stream.Collectors;
+
+Map<String, List<Student>> map = totalList.stream().collect(Collectors.groupingBy(s -> s.getSex()));
+
+```
+
+
+Collector.groupingBy()메소드는 그룹핑 후 매핑 및 집계를 수행할 수 있도록 두번째 매개값이 Collector를 가질 수 있다.
+다음은 두번째 매개값으로 사용될 Collector를 얻을 수 있는 Collectors의 정적 메소들이다. <br>
+Collector.mapping(Function, Collector) : 매핑 <br>
+Collector.averagingDouble(ToDoubleFunction) : 평균값 <br>
+Collector.counting() : 요소수 <br>
+Collector.maxBy(Comparator) : 최대값 <br>
+Collector.minBy(Comparator) : 최소값 <br>
+Collector.reducing(BinaryOperator<T>) <br>
+Collector.reducing(T identity,BinaryOperator<T>) : 커스텀 집계 값 <br>
+
+ ## 요소 병렬 처리  Parallel Operation
+ 멀티 코어  CPU  환경에서 전체 요소를 분할해서 각각의 코어가 병렬적으로 처리하는 것을 말하낟. 요소 병렬 처리의 목적은 작업 처리 시간을 줄이는 것에 있다.
+자바는 요소 병렬 처리를 위해 병렬 스트림을 제공한다.
+
+
+### 동시성과 병렬성  Concurrency , Parallelism
+ 멀티스레드는 동시성 또는 병렬성으로 실행되기 때문에 이들 용어에 대해 정확히 이해하는 것이 좋다.
+동시성은 멀티 작업을 위해 멀티 스레드가 하나의 코어에서 번갈아 가면 실행하는 것을 말하고 병렬성은 멀티 작업을 위해 멀티 코어를 각각 이용해서 병렬로 실행하는 것을 말한다.
+<br>
+![img.png](resource/img_19.png)
+ 
+동시성은 한 시점에 하나의 작업만 실행한다. 번갈아 작업을 실행하는 것이 워낙 빠르다보니 동시에 처리되는 것처럼 보일 뿐이다.<br>
+병렬성은 한 시점에 여러 개의 작업을 병렬로 실행하기 때문에 동시성보다는 좋은 성능을 낸다.<br>
+병렬성은 데이터 병렬성과 작업 병렬성으로 구분할 수 있다.
+
+#### Data Parallelism (데이터 병렬성)
+전체 데이터를 분할해서 서브 데이터셋으로 만들고 이 서브 데이터셋들을 병렬 처리해서 작업을 빨리 끝내는 것을 말한다.
+자바 병렬 스트림은 데이터 병렬성을 구현한 것이다.
+
+#### Task Parallelism (작업 병렬성)
+작업 병렬성은 서로 다른 작업을 병렬 처리하는 것을 말한다. 작업 병렬성의 대표적인 예로는 서버 프로그램이다.
+서버는 각각의 클라이언트에서 요청한 내용을 개별 스레드에서 병렬로 처리한다.
+
+
+### 포크조인 프레임워크
+자바 병렬 스트림은 요소들을 병렬 처리하기 위해 포크조인 프레임워크를 사용한다.
+포크조인 프레임 워크는 포크단계에서 전체 요소들을 서브 요소셋으로 분할하고 각각의 서브 요소셋을 멀티 코어에서 병렬로 처리한다.
+조인 단꼥렝서는 서브 결과를 결합해서 최종 결과를 만들어낸다.
+
+![img_1.png](resource/img_20.png)
+예를 들어 코드 CPUI에서 병렬 스트림으로 요소들을 처리할 셩우 먼저 포크 단계에서 스트림의 전체 요소들을 4개의 서브 요소셋으로 분할한다.
+그리고 각각의 서브 요소셋을 개별 코어에서 처리하고 조인 단계에서는 3번의 결합 과정을 거쳐 최종 결과를 산출한다.
+병렬 처리 스트림은 포크 단계에서 요소를 순서대로 분할하지 않는다. 이해하기 쉽도록 위 그릠에서는 앞에서부터 차례댛로 4등분했지만 내부적으로 요소들을 나누는 알고리즘이 있기 때문에 개발자는 신경 쓸 필요가 없다.<br>
+포크 조인 프레임워크는 병렬 처리를 위해 스레드풀을 사용한다. 각각의 코어에서 서브 요소셋을 처리하는 것은 작업 스레드가 해야 하므로 스레드 관리가 필요하다.
+포크 조인 프레임워크는 ExecutorService 구현 객체인 ForkJoin Pool을 사용해서 작업 스레드를 관리한다.
+![img_2.png](resource/img_21.png)
+
+### 병렬 스트림 사용
+자바 병렬 스트림을 이용할 경우에는 백그라운드에서 포크조인 프레임워크가 사용되기 때문에 개발자는 매우 쉽게 병렬 처릴를 할 수 있다.
+병렬 스트림은 다음 두가지 메소드로 얻을 수 있다.<br>
+Stream.parallelStream() : List, Set 컬렉션 <br>
+Stream, IntStream, LongStream, DoubleStream.parallel(): java.util.Stream, java.util.IntStream, java.util.LongStream, java.util.DoubleStream
+<br>
+parallelStream() 메소드는 컬렉션(List, Set)으로부터 병렬 스트림을 바로 리턴한다. parallel()메소드는 기존 스트림을 병렬 처리 스트림으로 변환한다.
+<br>
+### 병렬 처리 성능
+스트림 병렬 처리가 스트림 순차 처리보다 항상 실행 성능이 좋다는건 아니다. 그전에 먼저 병렬 처리에 영향을 미치는 3가지 요인을 봐야한다.
+1) 요소의 수와 요소당 처리 시간
+컬렉션에 전체 요소의 수가 적고 요소당 처리 시간이 짧으면 일반 스트림이 병렬 스트림보다 빠를 수 있다. 병렬 처리는 포크 및 조인 단계가 있고 스레드 풀을 생성하는 추가적인 비용이 발생하기  때문이다.
+2) 스트림 소스의 종류
+ArrayList와 배열은 인덱스로 요소를 관리하기 때문에 포크 단계에서 요소를 쉽게 분리할 수 있어 병렬 처리 시간이 절약된다. 반면에 HashSet, TreeSet은 요소 분리가 쉽지 않고 LinkedList 역시 링크를 따라가야 하므로 요소 분리가 쉽지 않다 따라서 이 소스들은 상대적으로 병렬 처리가 늦다.
+3) 코어의 수 (Core)
+CPU 코어의 수가 많으면 많을수록 병렬 스트림의 성능은 좋아진다. 하지만 코어 수가 적을 경우에는 일반 스트림이 더 빠를 수 있다. 병렬 스트림은 스레드 수가 증가하여 동시성이 많이 일어나므로 오히려 느려진다.
